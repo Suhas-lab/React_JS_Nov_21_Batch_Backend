@@ -42,9 +42,6 @@ app.get('/userdetails', (req, res) =>{
 app.post('/login', loginValidation, (req, res, next) =>{
     let userQuery = `SELECT * FROM users WHERE email = "${req.body.email}";`
     connection.query(userQuery, (err, result) =>{
-        console.log("err =>", err);
-        console.log("result =>", result);
-
         if (err) {
             throw err;
             return res.status(400).send({
@@ -56,14 +53,11 @@ app.post('/login', loginValidation, (req, res, next) =>{
               msg: 'Email or password is incorrect!'
             });
           }
-          console.log("req.body.password => ", req.body.password);
-          console.log("result[0]['password'] =>", result[0]['password']);
-        
         bcrypt.hash(result[0]['password'], salt, function(err, hash){
             if(err) throw err;
             bcrypt.compare(req.body.password, hash, function(err, iMatch) {
               if (err) { throw (err); }
-              console.log("iMatch =>", iMatch); 
+            //   console.log("iMatch =>", iMatch); 
               if(iMatch){
                 const token = jwt.sign({id:result[0]['id']},'the-super-strong-secrect',{ expiresIn: '1h' });
                 connection.query(
